@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>管理员中心 - 医院预约挂号系统</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .section { margin-bottom: 40px; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 10px; }
+        .stat-card { padding: 15px; border: 1px solid #ccc; border-radius: 5px; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px; border: 1px solid #ccc; text-align: left; }
+        th { background-color: #f0f0f0; }
+        button { padding: 8px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button.delete { background-color: #f44336; }
+        button:hover { opacity: 0.9; }
+        .flash { padding: 10px; margin: 10px 0; border-radius: 5px; background-color: #d4edda; color: #155724; }
+        input, select { padding: 8px; margin-right: 10px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>管理员中心 - {{ real_name }}</h1>
+        <a href="{{ url_for('logout') }}">退出登录</a>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <div class="flash">{{ msg }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- 系统统计 -->
+    <div class="section">
+        <h2>系统数据统计</h2>
+        <div class="stats">
+            <div class="stat-card">
+                <h3>总用户数</h3>
+                <p>{{ stats.total_users }}</p>
+                <p>患者：{{ stats.patient_count }} | 医生：{{ stats.doctor_count }} | 管理员：{{ stats.admin_count }}</p>
+            </div>
+            <div class="stat-card">
+                <h3>科室数</h3>
+                <p>{{ stats.dept_count }}</p>
+            </div>
+            <div class="stat-card">
+                <h3>总预约数</h3>
+                <p>{{ stats.total_appts }}</p>
+                <p>待接诊：{{ stats.pending_appts }} | 已完成：{{ stats.completed_appts }} | 已取消：{{ stats.canceled_appts }}</p>
+            </div>
+            <div class="stat-card">
+                <h3>总病历数</h3>
+                <p>{{ stats.total_records }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 科室管理 -->
+    <div class="section">
+        <h2>科室管理</h2>
+        <form method="POST" action="{{ url_for('add_dept') }}">
+            <label>添加科室：</label>
+            <input type="text" name="dept_id" placeholder="科室ID（如NEIKE）" required>
+            <input type="text" name="dept_name" placeholder="科室名称（如内科）" required>
+            <button type="submit">添加</button>
+        </form>
+
+        {% if departments %}
+            <table>
+                <tr>
+                    <th>科室ID</th>
+                    <th>科室名称</th>
+                    <th>医生数量</th>
+                    <th>操作</th>
+                </tr>
+                {% for dept_id, dept in departments %}
+                    <tr>
+                        <td>{{ dept_id }}</td>
+                        <td>{{ dept.dept_name }}</td>
+                        <td>{{ dept.doctors|length }}</td>
+                        <td>
+                            <a href="{{ url_for('delete_dept', dept_id=dept_id) }}">
+                                <button class="delete">删除</button>
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>暂无科室，请先添加</p>
+        {% endif %}
+    </div>
+
+    <!-- 医生出诊时间管理 -->
+    <div class="section">
+        <h2>医生出诊时间管理</h2>
+        {% if doctors %}
+            <table>
+                <tr>
+                    <th>医生账号</th>
+                    <th>姓名</th>
+                    <th>工号</th>
+                    <th>所属科室</th>
+                    <th>当前出诊日期</th>
+                    <th>操作</th>
+                </tr>
+                {% for doctor in doctors %}
+                    <tr>
+                        <td>{{ doctor.username }}</td>
+                        <td>{{ doctor.name }}</td>
+                        <td>{{ doctor.id }}</td>
+                        <td>{{ doctor.dept_name }}</td>
+                        <td>{{ doctor.working_days|join('、') or '暂无' }}</td>
+                        <td>
+                            <button onclick="showSetWorkingDays('{{ doctor.username }}', '{{ doctor.name }}')">设置出诊日期</button>
+                            <!-- 新增：删除医生按钮 -->
+                            <button class="delete" onclick="confirmDeleteDoctor('{{ doctor.username }}', '{{ doctor.name }}')" style="margin-left:10px;">删除医生</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>暂无医生</p>
+        {% endif %}
+
+        <!-- 设置出诊日期表单（默认隐藏） -->
+        <div id="workingDaysForm" style="display: none; margin-top: 20px;">
+            <h3>设置 <span id="docName"></span> 的出诊日期</h3>
+            <form method="POST" action="{{ url_for('set_working_days') }}">
+                <input type="hidden" name="doc_username" id="docUsername">
+                <input type="text" name="working_days" placeholder="日期格式：YYYY-MM-DD，多个日期用逗号分隔（如2025-12-16,2025-12-17）" required>
+                <button type="submit">保存</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 显示设置出诊日期表单
+        function showSetWorkingDays(docUsername, docName) {
+            document.getElementById('workingDaysForm').style.display = 'block';
+            document.getElementById('docUsername').value = docUsername;
+            document.getElementById('docName').textContent = docName;
+            window.scrollTo(0, document.getElementById('workingDaysForm').offsetTop);
+        }
+
+        // 新增：确认删除医生
+        function confirmDeleteDoctor(docUsername, docName) {
+            if (confirm(`确定要删除医生【${docName}】吗？删除后该医生的待接诊预约会被自动取消，已完成的病历将保留！`)) {
+                window.location.href = "{{ url_for('delete_doctor', doc_username='') }}" + docUsername;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+{
+    "users": {
+        "admin": {
+            "username": "admin",
+            "password_hash": "ac0e7d037817094e9e0b4441f9bae3209d67b02fa484917065f71b16109a1a78",
+            "role": "admin",
+            "real_name": "系统管理员"
+        },
+        "hhhh1": {
+            "username": "hhhh1",
+            "password_hash": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+            "role": "doctor",
+            "real_name": "lll",
+            "doctor_id": "123456",
+            "department_id": "ee",
+            "working_days": [
+                "2025-12-16"
+            ],
+            "appointments": [
+                "APPT_20251215213510729275"
+            ]
+        },
+        "jjj1": {
+            "username": "jjj1",
+            "password_hash": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+            "role": "patient",
+            "real_name": "jjj",
+            "id_card": "500222200509138125",
+            "appointments": []
+        },
+        "ccy1": {
+            "username": "ccy1",
+            "password_hash": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+            "role": "patient",
+            "real_name": "陈长妍",
+            "id_card": "500222200509128126",
+            "appointments": [
+                "APPT_20251215213510729275",
+                "APPT_20251215214749517893"
+            ]
+        },
+        "mrq1": {
+            "username": "mrq1",
+            "password_hash": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+            "role": "doctor",
+            "real_name": "murenqin",
+            "doctor_id": "111112",
+            "department_id": "0001",
+            "working_days": [
+                "2025-12-18"
+            ],
+            "appointments": [
+                "APPT_20251215214749517893"
+            ]
+        },
+        "lfl1": {
+            "username": "lfl1",
+            "password_hash": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+            "role": "doctor",
+            "real_name": "lifulin",
+            "doctor_id": "111113",
+            "department_id": "0001",
+            "working_days": [
+                "2025-12-25"
+            ],
+            "appointments": [
+                "APPT_20251215215535929851"
+            ]
+        },
+        "lsf1": {
+            "username": "lsf1",
+            "password_hash": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+            "role": "patient",
+            "real_name": "lishufei",
+            "id_card": "500222200609138125",
+            "appointments": [
+                "APPT_20251215215535929851"
+            ]
+        },
+        "rxy1": {
+            "username": "rxy1",
+            "password_hash": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+            "role": "doctor",
+            "real_name": "ranxinyu",
+            "doctor_id": "111114",
+            "department_id": "0001",
+            "working_days": [
+                "2025-12-21"
+            ],
+            "appointments": [
+                "APPT_20251215220004114636"
+            ]
+        },
+        "pjy1": {
+            "username": "pjy1",
+            "password_hash": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+            "role": "patient",
+            "real_name": "pengjiayue",
+            "id_card": "500222200609128765",
+            "appointments": [
+                "APPT_20251215220004114636"
+            ]
+        }
+    },
+    "departments": {
+        "ee": {
+            "dept_id": "ee",
+            "dept_name": "ee",
+            "doctors": [
+                "hhhh1"
+            ]
+        },
+        "0001": {
+            "dept_id": "0001",
+            "dept_name": "内科",
+            "doctors": [
+                "mrq1",
+                "lfl1",
+                "rxy1"
+            ]
+        },
+        "0002": {
+            "dept_id": "0002",
+            "dept_name": "外科",
+            "doctors": []
+        }
+    },
+    "appointments": {
+        "APPT_20251215213510729275": {
+            "appt_id": "APPT_20251215213510729275",
+            "patient_username": "ccy1",
+            "doctor_username": "hhhh1",
+            "appt_time": "2025-12-16 8:00",
+            "status": "pending"
+        },
+        "APPT_20251215214749517893": {
+            "appt_id": "APPT_20251215214749517893",
+            "patient_username": "ccy1",
+            "doctor_username": "mrq1",
+            "appt_time": "2025-12-18 8:00",
+            "status": "completed"
+        },
+        "APPT_20251215215535929851": {
+            "appt_id": "APPT_20251215215535929851",
+            "patient_username": "lsf1",
+            "doctor_username": "lfl1",
+            "appt_time": "2025-12-25 8:00",
+            "status": "pending"
+        },
+        "APPT_20251215220004114636": {
+            "appt_id": "APPT_20251215220004114636",
+            "patient_username": "pjy1",
+            "doctor_username": "rxy1",
+            "appt_time": "2025-12-21 8:00",
+            "status": "completed"
+        }
+    },
+    "medical_records": {
+        "REC_20251215214905231400": {
+            "record_id": "REC_20251215214905231400",
+            "appt_id": "APPT_20251215214749517893",
+            "patient_username": "ccy1",
+            "doctor_username": "mrq1",
+            "diagnosis": "咳嗽",
+            "prescriptions": [
+                {
+                    "drug": "胶囊",
+                    "dose": "12"
+                },
+                {
+                    "drug": "vv",
+                    "dose": "13"
+                }
+            ]
+        },
+        "REC_20251215220105495318": {
+            "record_id": "REC_20251215220105495318",
+            "appt_id": "APPT_20251215220004114636",
+            "patient_username": "pjy1",
+            "doctor_username": "rxy1",
+            "diagnosis": "发烧",
+            "prescriptions": [
+                {
+                    "drug": "布洛芬",
+                    "dose": "15ml"
+                },
+                {
+                    "drug": "布洛芬胶囊",
+                    "dose": "2粒"
+                }
+            ]
+        }
+    }
+}

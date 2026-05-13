@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>医生中心 - 医院预约挂号系统</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .section { margin-bottom: 40px; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px; border: 1px solid #ccc; text-align: left; }
+        th { background-color: #f0f0f0; }
+        button { padding: 8px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { opacity: 0.9; }
+        .flash { padding: 10px; margin: 10px 0; border-radius: 5px; background-color: #d4edda; color: #155724; }
+        .prescription-row { margin: 10px 0; display: flex; gap: 10px; }
+        .add-pres { background-color: #2196F3; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>医生中心 - {{ real_name }}</h1>
+        <a href="{{ url_for('logout') }}">退出登录</a>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <div class="flash">{{ msg }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- 我的预约区域 -->
+    <div class="section">
+        <h2>我的预约</h2>
+        {% if appointments %}
+            <table>
+                <tr>
+                    <th>预约ID</th>
+                    <th>患者姓名</th>
+                    <th>患者身份证号</th>
+                    <th>预约时间</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </tr>
+                {% for appt in appointments %}
+                    <tr>
+                        <td>{{ appt.id }}</td>
+                        <td>{{ appt.patient_name }}</td>
+                        <td>{{ appt.patient_id_card }}</td>
+                        <td>{{ appt.time }}</td>
+                        <td>{{ appt.status }}</td>
+                        <td>
+                            {% if appt.status == 'pending' %}
+                                <button onclick="showConsultForm('{{ appt.id }}', '{{ appt.patient_name }}')">接诊</button>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>暂无预约记录</p>
+        {% endif %}
+    </div>
+
+    <!-- 接诊表单（默认隐藏） -->
+    <div class="section" id="consultForm" style="display: none;">
+        <h2>接诊患者 - <span id="patientName"></span></h2>
+        <form method="POST" id="consultFormContent">
+            <input type="hidden" name="appt_id" id="formApptId">
+            <div>
+                <label>诊断结果：</label>
+                <input type="text" name="diagnosis" style="width: 500px;" required>
+            </div>
+            <div>
+                <h3>处方</h3>
+                <div id="prescriptions">
+                    <div class="prescription-row">
+                        <input type="text" name="drug[]" placeholder="药品名称" required>
+                        <input type="text" name="dose[]" placeholder="剂量/用法" required>
+                    </div>
+                </div>
+                <button type="button" class="add-pres" onclick="addPrescriptionRow()">添加药品</button>
+            </div>
+            <button type="submit" style="margin-top: 20px;">提交病历</button>
+        </form>
+    </div>
+
+    <!-- 我的接诊记录 -->
+    <div class="section">
+        <h2>我的接诊记录</h2>
+        {% if consult_records %}
+            <table>
+                <tr>
+                    <th>病历ID</th>
+                    <th>患者姓名</th>
+                    <th>患者身份证号</th>
+                    <th>诊断结果</th>
+                </tr>
+                {% for record in consult_records %}
+                    <tr>
+                        <td>{{ record.id }}</td>
+                        <td>{{ record.patient_name }}</td>
+                        <td>{{ record.patient_id_card }}</td>
+                        <td>{{ record.diagnosis }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>暂无接诊记录</p>
+        {% endif %}
+    </div>
+
+    <script>
+        // 显示接诊表单
+        function showConsultForm(apptId, patientName) {
+            document.getElementById('consultForm').style.display = 'block';
+            document.getElementById('patientName').textContent = patientName;
+            document.getElementById('formApptId').value = apptId;
+            document.getElementById('consultFormContent').action = "{{ url_for('doctor_consult', appt_id='') }}" + apptId;
+            window.scrollTo(0, document.getElementById('consultForm').offsetTop);
+        }
+
+        // 添加处方行
+        function addPrescriptionRow() {
+            const container = document.getElementById('prescriptions');
+            const row = document.createElement('div');
+            row.className = 'prescription-row';
+            row.innerHTML = `
+                <input type="text" name="drug[]" placeholder="药品名称" required>
+                <input type="text" name="dose[]" placeholder="剂量/用法" required>
+            `;
+            container.appendChild(row);
+        }
+    </script>
+</body>
+</html>

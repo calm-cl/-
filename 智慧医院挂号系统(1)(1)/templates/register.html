@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>注册 - 医院预约挂号系统</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 8px; box-sizing: border-box; }
+        button { padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background-color: #45a049; }
+        .flash { padding: 10px; margin: 10px 0; border-radius: 5px; background-color: #f8d7da; color: #721c24; }
+        .back { margin-top: 15px; display: block; text-decoration: none; color: #333; }
+        .role-fields { display: none; }
+        .role-fields.active { display: block; }
+    </style>
+</head>
+<body>
+    <h1>用户注册</h1>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <div class="flash">{{ msg }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" id="registerForm">
+        <div class="form-group">
+            <label for="username">账号（4-20位字母+数字）</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+            <label for="password">密码（至少6位）</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div class="form-group">
+            <label for="real_name">真实姓名</label>
+            <input type="text" id="real_name" name="real_name" required>
+        </div>
+        <div class="form-group">
+            <label for="role">角色</label>
+            <select id="role" name="role" required onchange="showRoleFields()">
+                <option value="">请选择角色</option>
+                <option value="patient">患者</option>
+                <option value="doctor">医生</option>
+                <option value="admin">管理员</option>
+            </select>
+        </div>
+
+        <!-- 患者专属字段 -->
+        <div class="form-group role-fields" id="patientFields">
+            <label for="id_card">身份证号</label>
+            <input type="text" id="id_card" name="id_card">
+        </div>
+
+        <!-- 医生专属字段 -->
+        <div class="form-group role-fields" id="doctorFields">
+            <label for="doctor_id">医生工号（6位数字）</label>
+            <input type="text" id="doctor_id" name="doctor_id">
+            <label for="department_id">所属科室</label>
+            <select id="department_id" name="department_id">
+                {% if departments %}
+                    {% for dept_id, dept in departments.items() %}
+                        <option value="{{ dept_id }}">{{ dept.dept_name }}（{{ dept_id }}）</option>
+                    {% endfor %}
+                {% else %}
+                    <option value="">暂无科室（请联系管理员创建）</option>
+                {% endif %}
+            </select>
+        </div>
+
+        <!-- 管理员无专属字段 -->
+        <div class="form-group role-fields" id="adminFields"></div>
+
+        <button type="submit">注册</button>
+    </form>
+
+    <a href="{{ url_for('index') }}" class="back">返回首页</a>
+    <a href="{{ url_for('login') }}" class="back">已有账号？立即登录</a>
+
+    <script>
+        function showRoleFields() {
+            // 隐藏所有角色字段
+            document.getElementById('patientFields').classList.remove('active');
+            document.getElementById('doctorFields').classList.remove('active');
+            document.getElementById('adminFields').classList.remove('active');
+
+            // 显示选中角色的字段
+            const role = document.getElementById('role').value;
+            if (role === 'patient') {
+                document.getElementById('patientFields').classList.add('active');
+            } else if (role === 'doctor') {
+                document.getElementById('doctorFields').classList.add('active');
+            } else if (role === 'admin') {
+                document.getElementById('adminFields').classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>
